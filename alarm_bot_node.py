@@ -4,7 +4,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import telebot
 
-TELEGRAM_TOKEN = '8991496997:AAHkophk2m9Dip42jAH-yW1E2pnY5TZjNas'
+TELEGRAM_TOKEN = '8991496997:AAGl5nM5Oj5s8xEcbW0tGPnjVzrdugFimco'
 CHAT_ID = '7254358750'
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
