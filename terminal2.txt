@@ -1,0 +1,7 @@
+sudo docker ps
+
+sudo docker exec -it <ID_CONTAINER> /bin/bash
+
+source /opt/ros/*/setup.bash
+
+ros2 topic pub --once /alarm_event std_msgs/msg/String "data: 'DEMO: Test'"
