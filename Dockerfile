@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y \
     nano \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install pyTelegramBotAPI --break-system-packages
+RUN pip3 install pyTelegramBotAPI pyserial --break-system-packages
 
 WORKDIR /ws
 
