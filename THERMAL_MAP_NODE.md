@@ -45,3 +45,27 @@ This node subscribes to temperature readings on `/temperature_data` and uses the
    ros2 topic pub /temperature_data std_msgs/String "data: '72'" --once
    ```
 4. If Terminal 2 shows `Temp: 72.0°C la pozitia: (0.00, 0.00)`, the node is working correctly.
+
+## 4. Integration with Pupper Simulation (RViz & Gazebo)
+Because Docker isolates the shared memory (IPC) between containers, the thermal map node must be run directly inside the simulation container to receive real-time TF data from SLAM.
+1. **Start the main simulation** (from the `pupper_viz` repository):
+   ```bash
+   ./run.sh 1
+
+2. Start the thermal map node: Open a new terminal and attach to the running simulation container:
+   ```bash
+   docker exec -it $(docker ps -q -f ancestor=pupper_viz) bash
+   source /opt/ros/jazzy/setup.bash
+   python3 /alarm/thermal_map_node.py --ros-args -p use_sim_time:=true
+   ```
+
+   The --ros-args -p use_sim_time:=true flag is strictly required to synchronize the node's timestamps with the Gazebo physics clock, when you use pupper, this flag is not necessary.
+
+3. Provide sensor data: Open another terminal linked to the same container to pass sensor data:
+   ```bash
+   docker exec -it $(docker ps -q -f ancestor=pupper_viz) bash
+   source /opt/ros/jazzy/setup.bash
+   ros2 topic pub /temperature_data std_msgs/String "data: '60.0'" -r 2
+   ```
+
+To see the thermal spots, ensure the MarkerArray plugin in RViz is subscribed to the /thermal_map_markers topic.
