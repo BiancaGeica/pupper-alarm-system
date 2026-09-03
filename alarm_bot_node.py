@@ -22,6 +22,10 @@ class TelegramAlarmNode(Node):
             String, '/camera/poze_salvate', self.photo_callback, 10
         )
 
+        self.victim_subscription = self.create_subscription(
+            String, '/human_recognition/victim_alert_info', self.victim_callback, 10
+        )        
+
         self.get_logger().info('Nodul de alertare Telegram a pornit')
         self.send_telegram_alert('Sistem de alarma Pupper: Conexiune ROS 2 stabilita.')
 
@@ -36,6 +40,10 @@ class TelegramAlarmNode(Node):
                 bot.send_document(CHAT_ID, pgm_file)
         except Exception as e:
             self.get_logger().error(f'Eroare trimitere harta: {e}')
+
+    def victim_callback(self, msg):
+        self.get_logger().info(f'Victima gasita: {msg.data}')
+        self.send_telegram_alert(f'ALERTA VICTIME:\n{msg.data}')
 
     def send_telegram_alert(self, message_text):
         try:
