@@ -13,16 +13,29 @@ class WalkNode(Node):
         self.get_logger().info('Cautare cale libera.....')
 
     def scan_callback(self, msg):
-        front_ranges = msg.ranges[:45] + msg.ranges[-45:]
+        def get_min_dist(ranges_slice):
+            valid = [r for r in ranges_slice if 0.1 < r < 10.0]
+            return min(valid) if valid else 10.0
 
-        valid_ranges = [r for r in front_ranges if 0.1 < r < 10.0] # filter out invalid values
+        # Hokuyo Lidar: index 180 este in fata (0 grade), index 0 este in spate (-180 grade)
+        front_dist = get_min_dist(msg.ranges[150:210])  # Fata (180 +/- 30)
+        left_dist = get_min_dist(msg.ranges[210:270])   # Stanga (180 -> 270)
+        right_dist = get_min_dist(msg.ranges[90:150])   # Dreapta (90 -> 150)
 
         twist = Twist()
-        if valid_ranges and min(valid_ranges) < 0.5: # if there is somethinf cloder than 0.5m in front of pup
-            twist.angular.z = -0.5 # turn right a bit
-            self.get_logger().info('Ups, nu pot merge inainte, reconfigurare traseu....')
+        
+        if front_dist < 0.5:
+            twist.linear.x = 0.0
+            
+            if left_dist > right_dist:
+                twist.angular.z = 0.5
+                self.get_logger().info(f'Ups! Incerc sa merg spre stanga....')
+            else:
+                twist.angular.z = -0.5
+                self.get_logger().info(f'Ups! Incerc sa merg spre dreapta....')
         else:
-            twist.linear.x = 0.2 # move forward
+            twist.linear.x = 0.2
+            twist.angular.z = 0.0
             self.get_logger().info('Cale libera, inainte....')
 
         self.cmd_pub.publish(twist)

@@ -44,9 +44,9 @@ class InverseKinematics(Node):
         self.target_joint_positions = [0.0] * 12
 
         self.base_triangle = np.array([
-            [0.06, 0.0, -0.14],  # Touchdown
-            [-0.06, 0.0, -0.14], # Liftoff
-            [0.0, 0.0, -0.09]    # Mid-swing
+            [0.05, 0.0, -0.12],  # Touchdown
+            [-0.05, 0.0, -0.12], # Liftoff
+            [0.0, 0.0, -0.09]    # Mid-swing (ridica laba doar 3cm)
         ])
 
         self.center_fr = np.array([0.07500, -0.08350, 0])
@@ -528,10 +528,10 @@ class InverseKinematics(Node):
 
             # if it receives a command to move forward
             if self.current_linear_x > 0.05:
-                self.t += self.ik_timer_period * 4.0
+                self.t += self.ik_timer_period * 2.5
             # if it receives a command to turn left or right
             elif abs(self.current_angular_z) > 0.1:
-                self.t += self.ik_timer_period * 4.0
+                self.t += self.ik_timer_period * 2.5
             
             self.get_logger().info(f'Robotul merge! FR: {target_ee_fr[0]:.2f}, FL: {target_ee_fl[0]:.2f}')
 
