@@ -4,7 +4,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import telebot
 
-TELEGRAM_TOKEN = 'INSEREAZA_TOKEN_AICI'
+TELEGRAM_TOKEN = '8991496997:AAGmZ09w3SpBYXPF9tO4tLhnSwiFwk-qKdM'
 CHAT_ID = '7254358750'
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
@@ -21,10 +21,9 @@ class TelegramAlarmNode(Node):
         self.photo_subscription = self.create_subscription(
             String, '/camera/poze_salvate', self.photo_callback, 10
         )
-
-        self.victim_subscription = self.create_subscription(
-            String, '/human_recognition/victim_alert_info', self.victim_callback, 10
-        )        
+        self.human_sub = self.create_subscription(
+            String, '/human_recognition/victim_alert_info', self.human_callback, 10
+        )
 
         self.get_logger().info('Nodul de alertare Telegram a pornit')
         self.send_telegram_alert('Sistem de alarma Pupper: Conexiune ROS 2 stabilita.')
@@ -51,6 +50,9 @@ class TelegramAlarmNode(Node):
         except Exception as e:
             self.get_logger().error(f'Eroare trimitere Telegram: {e}')
 
+    def human_callback(self, msg):
+        self.get_logger().info(f'Alerta vizuala primita: {msg.data}')
+        self.send_telegram_alert(f'CAMERA ROBOT: {msg.data}')
 
 @bot.message_handler(commands=['status'])
 def handle_status(message):
